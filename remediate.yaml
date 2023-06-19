@@ -1,0 +1,35 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    cis_results: "{{ lookup('file', 'cis_results.yaml') }}"
+  tasks:
+  - name: Change permissions
+    file:
+      path: "{{ item.path }}"
+      owner: "{{ item.owner }}"
+      group: "{{ item.group }}"
+      mode: "{{ item.mode }}"
+      state: changed
+      loop: "{{ cis_results.permissions }}"
+
+  - name: Disable services
+    service:
+      name: "{{ item.name }}"
+      state: stopped
+      enabled: no
+      loop: "{{ cis_results.services }}"
+
+  - name: Remove unnecessary packages
+    package:
+      name: "{{ item.name }}"
+      state: absent
+      loop: "{{ cis_results.packages }}"
+
+  - name: Patch known vulnerabilities
+    yum:
+      name: "{{ item.name }}"
+      state: latest
+      update_cache: yes
+      loop: "{{ cis_results.vulnerabilities }}"
+
