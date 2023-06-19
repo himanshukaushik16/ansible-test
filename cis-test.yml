@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+  - name: Install the CIS role
+    ansible-galaxy install RedHatOfficial.rhel8_cis
+
+  - name: Run the CIS benchmark
+    ansible-playbook -i hosts.yaml rhel8_cis.yaml
+
+  - name: Harden the system
+    include: harden.yaml
+
