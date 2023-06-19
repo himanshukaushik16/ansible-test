@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    cis_profile: rhel8-level2
+  tasks:
+  - name: Install the CIS role
+    ansible-galaxy install RedHatOfficial.rhel8_cis
+
+  - name: Run the CIS benchmark
+    ansible-playbook -i hosts.yaml -c local --check rhel8_cis_check.yml
+
+  - name: Report findings
+    debug:
+      var: ansible_facts.cis_results
+
